@@ -1,5 +1,5 @@
-from src.constants import *
-from src.entities.entity import Entity
+from constants import *
+from entities.entity import Entity
 
 
 class PlayerCharacter(Entity):

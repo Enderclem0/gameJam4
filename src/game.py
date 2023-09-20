@@ -4,8 +4,8 @@ Platformer Game
 
 import arcade
 
-from src.constants import *
-from src.ui import GameView
+from constants import *
+from ui import GameView
 
 
 class MainMenu(arcade.View):

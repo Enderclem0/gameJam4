@@ -3,9 +3,9 @@ import math
 import arcade
 import os
 
-from src.enemies.enemy import RobotEnemy, ZombieEnemy
-from src.entities.player import PlayerCharacter
-from src.constants import *
+from enemies.enemy import RobotEnemy, ZombieEnemy
+from entities.player import PlayerCharacter
+from constants import *
 
 
 class GameView(arcade.View):

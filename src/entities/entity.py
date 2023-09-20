@@ -1,7 +1,7 @@
 import arcade
 
-from src.constants import *
-from src.utils import load_texture_pair
+from constants import *
+from utils import load_texture_pair
 
 
 class Entity(arcade.Sprite):
