@@ -262,13 +262,6 @@ class GameView(arcade.View):
         else:
             self.player_sprite.can_jump = True
 
-        if self.physics_engine.is_on_ladder() and not self.physics_engine.can_jump():
-            self.player_sprite.is_on_ladder = True
-            self.process_keychange()
-        else:
-            self.player_sprite.is_on_ladder = False
-            self.process_keychange()
-
         # Update Animations
         self.scene.update_animation(
             delta_time,
