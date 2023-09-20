@@ -41,7 +41,7 @@ class PlayerCharacter(arcade.Sprite):
 
         # Track our state
         self.jumping = False
-
+        self.should_update_walk = 0
         self.set_hit_box(self.texture.hit_box_points)
 
     def update_animation(self, delta_time: float = 1 / 60):
@@ -66,7 +66,13 @@ class PlayerCharacter(arcade.Sprite):
             return
 
         # Walking animation
-        self.cur_texture += 1
-        if self.cur_texture > 1:
-            self.cur_texture = 0
+        # if the current frame % 3 == 0... then change the texture
+
+        if self.should_update_walk == 6:
+            self.cur_texture += 1
+            if self.cur_texture > 1:
+                self.cur_texture = 0
+            self.should_update_walk = 0
+        else:
+            self.should_update_walk += 1
         self.texture = self.walk_textures[self.cur_texture][self.facing_direction]
