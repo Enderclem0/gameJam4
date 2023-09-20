@@ -176,12 +176,6 @@ class GameView(arcade.View):
             18,
         )
 
-        # Draw hit boxes.
-        # for wall in self.wall_list:
-        #     wall.draw_hit_box(arcade.color.BLACK, 3)
-        #
-        # self.player_sprite.draw_hit_box(arcade.color.RED, 3)
-
     def process_keychange(self):
         """
         Called when we change a key up/down or we move on/off a ladder.

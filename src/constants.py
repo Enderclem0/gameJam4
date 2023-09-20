@@ -18,9 +18,9 @@ TOP_VIEWPORT_MARGIN = 100
 SCREEN_TITLE = "Platformer"
 
 # Movement speed of player, in pixels per frame
-PLAYER_MOVEMENT_SPEED = 7
-GRAVITY = 1.5
-PLAYER_JUMP_SPEED = 30
+PLAYER_MOVEMENT_SPEED = 10
+GRAVITY = 1.2
+PLAYER_JUMP_SPEED = 20
 
 LAYER_NAME_MOVING_PLATFORMS = "Moving Platforms"
 LAYER_NAME_PLATFORMS = "Platforms"
@@ -32,7 +32,7 @@ LAYER_NAME_ENEMIES = "Enemies"
 
 # Player start position
 PLAYER_START_X = 2
-PLAYER_START_Y = 1
+PLAYER_START_Y = 2
 
 # Constants used to track if the player is facing left or right
 RIGHT_FACING = 0
