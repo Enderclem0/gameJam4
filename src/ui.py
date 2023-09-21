@@ -61,6 +61,7 @@ class GameView(arcade.View):
         self.hit_sound = arcade.load_sound(":resources:sounds/hit5.wav")
         self.checkpoint_sound = arcade.load_sound(":resources:sounds/hit1.wav")
         self.level_sound = arcade.load_sound(":resources:music/funkyrobot.mp3", streaming=True)
+        self.collect_coin_sound = arcade.load_sound(":resources:sounds/coin1.wav")
 
     def setup(self):
         """Set up the game here. Call this function to restart the game."""
@@ -97,7 +98,22 @@ class GameView(arcade.View):
             },
             LAYER_NAME_WATER: {
                 "use_spatial_hash": True,
-            }
+            },
+            LAYER_NAME_COINS: {
+                "use_spatial_hash": True,
+            },
+            LAYER_NAME_ENEMIES: {
+                "use_spatial_hash": True,
+            },
+            LAYER_NAME_FLAG: {
+                "use_spatial_hash": True,
+            },
+            LAYER_NAME_KEY: {
+                "use_spatial_hash": True,
+            },
+            LAYER_NAME_DOOR: {
+                "use_spatial_hash": True,
+            },
         }
 
         # Load in TileMap
@@ -268,7 +284,8 @@ class GameView(arcade.View):
             [
                 self.scene[LAYER_NAME_ENEMIES],
                 self.scene[LAYER_NAME_WATER],
-                self.scene[LAYER_NAME_FLAG]
+                self.scene[LAYER_NAME_FLAG],
+                self.scene[LAYER_NAME_COINS],
             ],
         )
         for collision in player_collision_list:
@@ -278,16 +295,21 @@ class GameView(arcade.View):
                 game_over = GameOverView(self, "normal")
                 self.window.show_view(game_over)
                 return
-            if self.scene[LAYER_NAME_WATER] in collision.sprite_lists:
+            elif self.scene[LAYER_NAME_WATER] in collision.sprite_lists:
                 arcade.stop_sound(self.music)
                 arcade.play_sound(self.water_sound)
                 game_over = GameOverView(self, "water")
                 self.window.show_view(game_over)
                 return
-            if self.scene[LAYER_NAME_FLAG] in collision.sprite_lists:
+            elif self.scene[LAYER_NAME_FLAG] in collision.sprite_lists:
                 self.restart_x = self.player_sprite.center_x
                 self.restart_y = self.player_sprite.center_y
                 arcade.play_sound(self.checkpoint_sound)
+                collision.remove_from_sprite_lists()
+            elif self.scene[LAYER_NAME_COINS] in collision.sprite_lists:
+                arcade.play_sound(self.collect_coin_sound)
+                points = 1
+                self.score += points
                 collision.remove_from_sprite_lists()
 
         # Position the camera
@@ -316,21 +338,18 @@ class GameOverView(arcade.View):
 
         self.background = arcade.load_texture(f"../rsc/PNG/Menu/Game_over_{mode}.jpg")
 
-
     def on_show_view(self):
         """Called when switching to this view"""
         arcade.set_background_color(arcade.color.BLACK)
-
 
     def on_draw(self):
         """Draw the game overview"""
         self.clear()
 
         arcade.draw_lrwh_rectangle_textured(0, 0,
-            SCREEN_WIDTH, SCREEN_HEIGHT,
-            self.background
-        )
-
+                                            SCREEN_WIDTH, SCREEN_HEIGHT,
+                                            self.background
+                                            )
 
     def on_mouse_press(self, _x, _y, _button, _modifiers):
         """Use a mouse press to advance to the 'game' view."""
