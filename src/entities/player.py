@@ -32,17 +32,35 @@ class PlayerCharacter(arcade.Sprite):
         texture = load_texture_pair(f"{main_path}_walk2.png")
         self.walk_textures.append(texture)
 
+        # Set up parent class
+        super().__init__()
+
+        # Default to facing right
+        self.facing_direction = RIGHT_FACING
+
+        # Used for image sequences
+        self.cur_texture = 0
+        self.scale = PLAYER_SCALING
+
+        main_path = f"../rsc/PNG/Players/128x256/Yellow/alienYellow"
+
+        self.idle_texture_pair = load_texture_pair(f"{main_path}_stand.png")
+        self.jump_texture_pair = load_texture_pair(f"{main_path}_jump.png")
+        self.fall_texture_pair = load_texture_pair(f"{main_path}_swim1.png")
+
+        # Load textures for walking
+        self.walk_textures = []
+        texture = load_texture_pair(f"{main_path}_walk1.png")
+        self.walk_textures.append(texture)
+        texture = load_texture_pair(f"{main_path}_walk2.png")
+        self.walk_textures.append(texture)
+
         # Set the initial texture
         self.texture = self.idle_texture_pair[0]
-
-        # Hit box will be set based on the first image used. If you want to specify
-        # a different hit box, you can do it like the code below.
-        # self.set_hit_box([[-22, -64], [22, -64], [22, 28], [-22, 28]])
 
         # Track our state
         self.jumping = False
         self.should_update_walk = 0
-        self.set_hit_box(self.texture.hit_box_points)
 
     def update_animation(self, delta_time: float = 1 / 60):
 

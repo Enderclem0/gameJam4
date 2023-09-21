@@ -89,7 +89,7 @@ class GameView(arcade.View):
             self.background.append(sprite)
 
         # Map name
-        map_name = "../rsc/test18.json"
+        map_name = "../rsc/test35.json"
 
         # Layer Specific Options for the Tilemap
         layer_options = {
@@ -161,7 +161,6 @@ class GameView(arcade.View):
         # Activate the game camera
         self.camera.use()
 
-
         # Draw background
         self.background.draw()
 
@@ -195,7 +194,6 @@ class GameView(arcade.View):
                 self.jump_needs_reset = True
                 arcade.play_sound(self.jump_sound)
 
-        # Process left/right
         if self.right_pressed and not self.left_pressed:
             self.player_sprite.change_x = PLAYER_MOVEMENT_SPEED
         elif self.left_pressed and not self.right_pressed:
@@ -234,7 +232,7 @@ class GameView(arcade.View):
 
     def center_camera_to_player(self, speed=0.2):
         screen_center_x = self.camera.scale * (self.player_sprite.center_x - (self.camera.viewport_width / 2))
-        screen_center_y = self.camera.scale * (self.player_sprite.center_y - (self.camera.viewport_height / 2))
+        screen_center_y = self.camera.scale * (self.player_sprite.center_y + 100 - (self.camera.viewport_height / 2))
         if screen_center_x < 0:
             screen_center_x = 0
         if screen_center_y < 0:
@@ -284,17 +282,18 @@ class GameView(arcade.View):
                 game_over = GameOverView(self, "normal")
                 self.window.show_view(game_over)
                 return
-            elif self.scene[LAYER_NAME_WATER] in collision.sprite_lists:
+            if self.scene[LAYER_NAME_WATER] in collision.sprite_lists:
                 arcade.stop_sound(self.music)
                 arcade.play_sound(self.water_sound)
                 game_over = GameOverView(self, "water")
                 self.window.show_view(game_over)
                 return
-            elif self.scene[LAYER_NAME_FLAG] in collision.sprite_lists:
+            if self.scene[LAYER_NAME_FLAG] in collision.sprite_lists:
                 self.restart_x = self.player_sprite.center_x
                 self.restart_y = self.player_sprite.center_y
                 arcade.play_sound(self.checkpoint_sound)
                 collision.remove_from_sprite_lists()
+
         # Position the camera
         self.center_camera_to_player()
         camera_x = self.camera.position[0]
@@ -306,6 +305,9 @@ class GameView(arcade.View):
             jump = (camera_x - offset) // sprite.width
             final_offset = offset + (jump + frame) * sprite.width
             sprite.left = final_offset
+
+        if self.player_sprite.center_y < 0:
+            self.player_sprite.center_y = 10000
 
 
 class GameOverView(arcade.View):
