@@ -21,13 +21,16 @@ SCREEN_TITLE = "Platformer"
 # Movement speed of player, in pixels per frame
 PLAYER_MOVEMENT_SPEED = 3
 GRAVITY = 1.2
-PLAYER_JUMP_SPEED = 18
+PLAYER_JUMP_SPEED = 21
 
 LAYER_NAME_MOVING_PLATFORMS = "Moving Platforms"
 LAYER_NAME_PLATFORMS = "Platforms"
 LAYER_NAME_BACKGROUND = "Background"
 LAYER_NAME_PLAYER = "Player"
 LAYER_NAME_ENEMIES = "Enemies"
+LAYER_NAME_SPIKES = "Spike"
+LAYER_NAME_KEY = "Key"
+LAYER_NAME_DOOR = "Door"
 
 # Player start position
 PLAYER_START_X = 2

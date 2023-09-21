@@ -1,9 +1,7 @@
-import math
 
 import arcade
 import os
 
-from src.enemies.enemy import Enemy
 from src.entities.player import PlayerCharacter
 from src.constants import *
 
@@ -54,7 +52,6 @@ class GameView(arcade.View):
         self.score = 0
 
         # Load sounds
-        self.collect_coin_sound = arcade.load_sound(":resources:sounds/coin1.wav")
         self.jump_sound = arcade.load_sound(":resources:sounds/jump1.wav")
         self.game_over = arcade.load_sound(":resources:sounds/gameover1.wav")
         self.hit_sound = arcade.load_sound(":resources:sounds/hit5.wav")
@@ -67,11 +64,14 @@ class GameView(arcade.View):
         self.gui_camera = arcade.Camera(self.window.width, self.window.height)
 
         # Map name
-        map_name = "../rsc/test7.json"
+        map_name = "../rsc/test10.json"
 
         # Layer Specific Options for the Tilemap
         layer_options = {
             LAYER_NAME_PLATFORMS: {
+                "use_spatial_hash": True,
+            },
+            LAYER_NAME_MOVING_PLATFORMS: {
                 "use_spatial_hash": True,
             },
         }
@@ -130,7 +130,7 @@ class GameView(arcade.View):
         # Create the 'physics engine'
         self.physics_engine = arcade.PhysicsEnginePlatformer(
             self.player_sprite,
-            # platforms=self.scene[LAYER_NAME_MOVING_PLATFORMS],
+            platforms=self.scene[LAYER_NAME_MOVING_PLATFORMS],
             gravity_constant=GRAVITY,
             walls=self.scene[LAYER_NAME_PLATFORMS]
         )
@@ -249,7 +249,7 @@ class GameView(arcade.View):
 
         # Update moving platforms, enemies, and bullets
         self.scene.update(
-            #[LAYER_NAME_MOVING_PLATFORMS, LAYER_NAME_ENEMIES]
+            [LAYER_NAME_MOVING_PLATFORMS]
         )
 
         # See if the enemy hit a boundary and needs to reverse direction.
