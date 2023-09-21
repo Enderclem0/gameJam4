@@ -281,13 +281,13 @@ class GameView(arcade.View):
             if self.scene[LAYER_NAME_ENEMIES] in collision.sprite_lists:
                 arcade.stop_sound(self.music)
                 arcade.play_sound(self.game_over)
-                game_over = GameOverView(self)
+                game_over = GameOverView(self, "normal")
                 self.window.show_view(game_over)
                 return
             elif self.scene[LAYER_NAME_WATER] in collision.sprite_lists:
                 arcade.stop_sound(self.music)
                 arcade.play_sound(self.water_sound)
-                game_over = GameOverView(self)
+                game_over = GameOverView(self, "water")
                 self.window.show_view(game_over)
                 return
             elif self.scene[LAYER_NAME_FLAG] in collision.sprite_lists:
@@ -311,12 +311,12 @@ class GameView(arcade.View):
 class GameOverView(arcade.View):
     """Class to manage the game overview"""
 
-    def __init__(self, game_view: arcade.View):
+    def __init__(self, game_view: arcade.View, mode):
         """This is run once when we switch to this view"""
         super().__init__()
         self.game_view = game_view
 
-        self.background = arcade.load_texture("../rsc/PNG/Menu/Game_over.jpg")
+        self.background = arcade.load_texture(f"../rsc/PNG/Menu/Game_over_{mode}.jpg")
 
 
     def on_show_view(self):
