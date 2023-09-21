@@ -62,10 +62,6 @@ class GameView(arcade.View):
         self.checkpoint_sound = arcade.load_sound(":resources:sounds/hit1.wav")
         self.level_sound = arcade.load_sound(":resources:music/funkyrobot.mp3", streaming=True)
 
-    def restart(self) -> arcade.View:
-        self.setup()
-        return self
-
     def setup(self):
         """Set up the game here. Call this function to restart the game."""
 
