@@ -1,4 +1,3 @@
-
 import arcade
 import os
 
@@ -18,6 +17,7 @@ class GameView(arcade.View):
         super().__init__()
 
         # Set the path to start with this program
+        self.background = arcade.SpriteList()
         self.music = None
         file_path = os.path.dirname(os.path.abspath(__file__))
         os.chdir(file_path)
@@ -57,7 +57,7 @@ class GameView(arcade.View):
         # Load sounds
         self.jump_sound = arcade.load_sound(":resources:sounds/jump1.wav")
         self.game_over = arcade.load_sound(":resources:sounds/gameover1.wav")
-        self.water_sound = arcade.load_sound("../rsc/water.mp3",)
+        self.water_sound = arcade.load_sound("../rsc/water.mp3", )
         self.hit_sound = arcade.load_sound(":resources:sounds/hit5.wav")
         self.checkpoint_sound = arcade.load_sound(":resources:sounds/hit1.wav")
         self.level_sound = arcade.load_sound(":resources:music/funkyrobot.mp3")
@@ -73,9 +73,23 @@ class GameView(arcade.View):
         self.camera = arcade.Camera(self.window.width, self.window.height)
         self.gui_camera = arcade.Camera(self.window.width, self.window.height)
 
+        images = ("../rsc/PNG/Backgrounds/blue_land.png",
+                  "../rsc/PNG/Backgrounds/colored_grass.png")
+        rise = BACKGROUND_RISE_AMOUNT * SPRITE_SCALING
+        for count, image in enumerate(images):
+            bottom = rise * len(images)
+            sprite = arcade.Sprite(image, scale=SPRITE_SCALING)
+            sprite.bottom = bottom
+            sprite.left = 0
+            self.background.append(sprite)
+
+            sprite = arcade.Sprite(image, scale=SPRITE_SCALING)
+            sprite.bottom = bottom
+            sprite.left = sprite.width
+            self.background.append(sprite)
 
         # Map name
-        map_name = "../rsc/test15.json"
+        map_name = "../rsc/test18.json"
 
         # Layer Specific Options for the Tilemap
         layer_options = {
@@ -87,7 +101,7 @@ class GameView(arcade.View):
             },
             LAYER_NAME_WATER: {
                 "use_spatial_hash": True,
-            },
+            }
         }
 
         # Load in TileMap
@@ -96,6 +110,12 @@ class GameView(arcade.View):
         # Initiate New Scene with our TileMap, this will automatically add all layers
         # from the map as SpriteLists in the scene in the proper order.
         self.scene = arcade.Scene.from_tilemap(self.tile_map)
+
+        self.left_pressed = False
+        self.right_pressed = False
+        self.up_pressed = False
+        self.down_pressed = False
+        self.jump_needs_reset = False
 
         # Keep track of the score
         self.score = 0
@@ -108,7 +128,6 @@ class GameView(arcade.View):
         if self.restart_y is None:
             self.restart_y = self.tile_map.tile_height * TILE_SCALING * PLAYER_START_Y
 
-
         self.player_sprite.center_x = self.restart_x
         self.player_sprite.center_y = self.restart_y
 
@@ -118,9 +137,8 @@ class GameView(arcade.View):
         self.end_of_map = self.tile_map.width * GRID_PIXEL_SIZE
 
         # --- Other stuff
-        # Set the background color
-        if self.tile_map.background_color:
-            arcade.set_background_color(self.tile_map.background_color)
+        # Set the background color to #d0f4f7
+        arcade.set_background_color(arcade.color_from_hex_string("#d0f4f7"))
 
         # Create the 'physics engine'
         self.physics_engine = arcade.PhysicsEnginePlatformer(
@@ -142,6 +160,10 @@ class GameView(arcade.View):
 
         # Activate the game camera
         self.camera.use()
+
+
+        # Draw background
+        self.background.draw()
 
         # Draw our Scene
         self.scene.draw()
@@ -237,7 +259,6 @@ class GameView(arcade.View):
         self.scene.update_animation(
             delta_time,
             [
-                # LAYER_NAME_BACKGROUND,
                 LAYER_NAME_PLAYER,
                 LAYER_NAME_ENEMIES,
             ],
@@ -276,6 +297,15 @@ class GameView(arcade.View):
                 collision.remove_from_sprite_lists()
         # Position the camera
         self.center_camera_to_player()
+        camera_x = self.camera.position[0]
+
+        for count, sprite in enumerate(self.background):
+            layer = count // 2
+            frame = count % 2
+            offset = camera_x / (2 ** (layer + 1))
+            jump = (camera_x - offset) // sprite.width
+            final_offset = offset + (jump + frame) * sprite.width
+            sprite.left = final_offset
 
 
 class GameOverView(arcade.View):

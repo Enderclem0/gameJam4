@@ -8,6 +8,10 @@ GRID_PIXEL_SIZE = SPRITE_PIXEL_SIZE * TILE_SCALING
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 650
 
+BACKGROUND_RISE_AMOUNT = 40
+SPRITE_SCALING = 1
+
+
 # How many pixels to keep as a minimum margin between the character
 # and the edge of the screen.
 LEFT_VIEWPORT_MARGIN = 200
@@ -25,7 +29,6 @@ PLAYER_JUMP_SPEED = 22
 
 LAYER_NAME_MOVING_PLATFORMS = "Moving Platforms"
 LAYER_NAME_PLATFORMS = "Platforms"
-LAYER_NAME_BACKGROUND = "Background"
 LAYER_NAME_PLAYER = "Player"
 LAYER_NAME_ENEMIES = "Enemy"
 LAYER_NAME_SPIKES = "Spike"
