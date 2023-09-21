@@ -24,7 +24,10 @@ class MainMenu(arcade.View):
             "font_size": 15,
             "font_color": arcade.color.WHITE,
             "border_color": arcade.color.AMBER,
-            "bg_color": (255, 191, 0)
+            "bg_color": (255, 191, 0),
+
+            "border_color_pressed": (255, 191, 0),
+            "font_color_pressed": (255, 191, 0),
         }
 
 
@@ -33,7 +36,10 @@ class MainMenu(arcade.View):
             "font_size": 15,
             "font_color": arcade.color.WHITE,
             "border_color": arcade.color.RED,
-            "bg_color": (255, 3, 62)
+            "bg_color": (255, 3, 62),
+
+            "border_color_pressed": (255, 3, 62),
+            "font_color_pressed": (255, 3, 62)
         }
 
 
@@ -60,7 +66,7 @@ class MainMenu(arcade.View):
                 anchor_x="center_x",
                 anchor_y="bottom",
                 align_x=165,
-                align_y=125,
+                align_y=110,
                 child=start_button
             )
         )
@@ -70,7 +76,7 @@ class MainMenu(arcade.View):
                 anchor_x="center_x",
                 anchor_y="bottom",
                 align_x=165,
-                align_y=50,
+                align_y=35,
                 child=quit_button
             )
         )
