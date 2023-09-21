@@ -8,6 +8,7 @@ import arcade.gui
 from constants import *
 from ui import GameView
 
+
 class MainMenu(arcade.View):
     """Class that manages the 'menu' view."""
 
@@ -42,7 +43,6 @@ class MainMenu(arcade.View):
         def on_click_quit_button(event):
             arcade.exit()
 
-
         self.manager.add(
             arcade.gui.UIAnchorWidget(
                 anchor_x="center_x",
@@ -57,15 +57,14 @@ class MainMenu(arcade.View):
 
         self.manager.enable()
 
-
     def on_hide_view(self):
         self.manager.disable()
-
 
     def on_draw(self):
         """Draw the menu"""
         self.clear()
         self.manager.draw()
+
 
 def main():
     """Main function"""

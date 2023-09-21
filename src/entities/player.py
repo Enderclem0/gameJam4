@@ -19,7 +19,7 @@ class PlayerCharacter(arcade.Sprite):
         self.cur_texture = 0
         self.scale = PLAYER_SCALING
 
-        main_path = f"../rsc/PNG/Players/128x256/Blue/alienBlue"
+        main_path = f"../rsc/PNG/Players/128x256/Yellow/alienYellow"
 
         self.idle_texture_pair = load_texture_pair(f"{main_path}_stand.png")
         self.jump_texture_pair = load_texture_pair(f"{main_path}_jump.png")

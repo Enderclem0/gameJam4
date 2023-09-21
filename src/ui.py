@@ -18,6 +18,7 @@ class GameView(arcade.View):
         super().__init__()
 
         # Set the path to start with this program
+        self.music = None
         file_path = os.path.dirname(os.path.abspath(__file__))
         os.chdir(file_path)
 
@@ -56,8 +57,14 @@ class GameView(arcade.View):
         # Load sounds
         self.jump_sound = arcade.load_sound(":resources:sounds/jump1.wav")
         self.game_over = arcade.load_sound(":resources:sounds/gameover1.wav")
+        self.water_sound = arcade.load_sound("../rsc/water.mp3",)
         self.hit_sound = arcade.load_sound(":resources:sounds/hit5.wav")
         self.checkpoint_sound = arcade.load_sound(":resources:sounds/hit1.wav")
+        self.level_sound = arcade.load_sound(":resources:music/funkyrobot.mp3")
+
+    def restart(self) -> arcade.View:
+        self.setup()
+        return self
 
     def setup(self):
         """Set up the game here. Call this function to restart the game."""
@@ -66,8 +73,9 @@ class GameView(arcade.View):
         self.camera = arcade.Camera(self.window.width, self.window.height)
         self.gui_camera = arcade.Camera(self.window.width, self.window.height)
 
+
         # Map name
-        map_name = "../rsc/test10.json"
+        map_name = "../rsc/test15.json"
 
         # Layer Specific Options for the Tilemap
         layer_options = {
@@ -77,10 +85,13 @@ class GameView(arcade.View):
             LAYER_NAME_MOVING_PLATFORMS: {
                 "use_spatial_hash": True,
             },
+            LAYER_NAME_WATER: {
+                "use_spatial_hash": True,
+            },
         }
 
         # Load in TileMap
-        self.tile_map = arcade.load_tilemap(map_name, TILE_SCALING)
+        self.tile_map = arcade.load_tilemap(map_name, TILE_SCALING, layer_options)
 
         # Initiate New Scene with our TileMap, this will automatically add all layers
         # from the map as SpriteLists in the scene in the proper order.
@@ -92,8 +103,11 @@ class GameView(arcade.View):
         # Set up the player, specifically placing it at these coordinates.
         self.player_sprite = PlayerCharacter()
 
-        self.restart_x = self.tile_map.tile_width * TILE_SCALING * PLAYER_START_X
-        self.restart_y = self.tile_map.tile_height * TILE_SCALING * PLAYER_START_Y
+        if self.restart_x is None:
+            self.restart_x = self.tile_map.tile_width * TILE_SCALING * PLAYER_START_X
+        if self.restart_y is None:
+            self.restart_y = self.tile_map.tile_height * TILE_SCALING * PLAYER_START_Y
+
 
         self.player_sprite.center_x = self.restart_x
         self.player_sprite.center_y = self.restart_y
@@ -102,29 +116,6 @@ class GameView(arcade.View):
 
         # Calculate the right edge of the my_map in pixels
         self.end_of_map = self.tile_map.width * GRID_PIXEL_SIZE
-
-        # -- Enemies
-        # enemies_layer = self.tile_map.object_lists[LAYER_NAME_ENEMIES]
-
-        # for my_object in enemies_layer:
-        #     cartesian = self.tile_map.get_cartesian(
-        #         my_object.shape[0], my_object.shape[1]
-        #     )
-        #     enemy_type = my_object.properties["type"]
-        #     enemy = Enemy()
-        #     enemy.center_x = math.floor(
-        #         cartesian[0] * TILE_SCALING * self.tile_map.tile_width
-        #     )
-        #     enemy.center_y = math.floor(
-        #         (cartesian[1] + 1) * (self.tile_map.tile_height * TILE_SCALING)
-        #     )
-        #     if "boundary_left" in my_object.properties:
-        #         enemy.boundary_left = my_object.properties["boundary_left"]
-        #     if "boundary_right" in my_object.properties:
-        #         enemy.boundary_right = my_object.properties["boundary_right"]
-        #     if "change_x" in my_object.properties:
-        #         enemy.change_x = my_object.properties["change_x"]
-        #     self.scene.add_sprite(LAYER_NAME_ENEMIES, enemy)
 
         # --- Other stuff
         # Set the background color
@@ -138,6 +129,7 @@ class GameView(arcade.View):
             gravity_constant=GRAVITY,
             walls=self.scene[LAYER_NAME_PLATFORMS]
         )
+        self.music = arcade.play_sound(self.level_sound)
 
     def on_show_view(self):
         self.setup()
@@ -245,69 +237,54 @@ class GameView(arcade.View):
         self.scene.update_animation(
             delta_time,
             [
-                #LAYER_NAME_BACKGROUND,
+                # LAYER_NAME_BACKGROUND,
                 LAYER_NAME_PLAYER,
-                #LAYER_NAME_ENEMIES,
+                LAYER_NAME_ENEMIES,
             ],
         )
 
         # Update moving platforms, enemies, and bullets
         self.scene.update(
-            [LAYER_NAME_MOVING_PLATFORMS]
+            [LAYER_NAME_MOVING_PLATFORMS, LAYER_NAME_ENEMIES]
         )
 
-        # See if the enemy hit a boundary and needs to reverse direction.
-        # for enemy in self.scene[LAYER_NAME_ENEMIES]:
-        #     if (
-        #             enemy.boundary_right
-        #             and enemy.right > enemy.boundary_right
-        #             and enemy.change_x > 0
-        #     ):
-        #         enemy.change_x *= -1
-        #
-        #     if (
-        #             enemy.boundary_left
-        #             and enemy.left < enemy.boundary_left
-        #             and enemy.change_x < 0
-        #     ):
-        #         enemy.change_x *= -1
-
-        # player_collision_list = arcade.check_for_collision_with_lists(
-        #     self.player_sprite,
-        #     [
-        #         self.scene[LAYER_NAME_ENEMIES],
-        #     ],
-        # )
-
-        # # Loop through each coin we hit (if any) and remove it
-        # for collision in player_collision_list:
-        #
-        #     if self.scene[LAYER_NAME_ENEMIES] in collision.sprite_lists:
-        #         arcade.play_sound(self.game_over)
-        #         game_over = GameOverView()
-        #         self.window.show_view(game_over)
-        #         return
-
-
-        # Checkpoints
-        checkpoints_collision = arcade.check_for_collision_with_list(self.player_sprite, self.scene[LAYER_NAME_FLAG])
-
-        if len(checkpoints_collision) > 0:
-
-            self.restart_x = self.player_sprite.center_x
-            self.restart_y = self.player_sprite.center_y
-
-            checkpoints_collision[0].kill()
-
-            arcade.play_sound(self.checkpoint_sound)
-
-
+        player_collision_list = arcade.check_for_collision_with_lists(
+            self.player_sprite,
+            [
+                self.scene[LAYER_NAME_ENEMIES],
+                self.scene[LAYER_NAME_WATER],
+                self.scene[LAYER_NAME_FLAG]
+            ],
+        )
+        for collision in player_collision_list:
+            if self.scene[LAYER_NAME_ENEMIES] in collision.sprite_lists:
+                arcade.stop_sound(self.music)
+                arcade.play_sound(self.game_over)
+                game_over = GameOverView(self)
+                self.window.show_view(game_over)
+                return
+            elif self.scene[LAYER_NAME_WATER] in collision.sprite_lists:
+                arcade.stop_sound(self.music)
+                arcade.play_sound(self.water_sound)
+                game_over = GameOverView(self)
+                self.window.show_view(game_over)
+                return
+            elif self.scene[LAYER_NAME_FLAG] in collision.sprite_lists:
+                self.restart_x = self.player_sprite.center_x
+                self.restart_y = self.player_sprite.center_y
+                arcade.play_sound(self.checkpoint_sound)
+                collision.remove_from_sprite_lists()
         # Position the camera
         self.center_camera_to_player()
 
 
 class GameOverView(arcade.View):
     """Class to manage the game overview"""
+
+    def __init__(self, game_view: arcade.View):
+        """This is run once when we switch to this view"""
+        super().__init__()
+        self.game_view = game_view
 
     def on_show_view(self):
         """Called when switching to this view"""
@@ -327,6 +304,7 @@ class GameOverView(arcade.View):
 
     def on_mouse_press(self, _x, _y, _button, _modifiers):
         """Use a mouse press to advance to the 'game' view."""
-        game_view = GameView()
-        self.window.show_view(game_view)
-
+        if self.game_view is not None:
+            self.window.show_view(self.game_view)
+        else:
+            self.window.show_view(GameView())
