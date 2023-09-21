@@ -60,7 +60,7 @@ class GameView(arcade.View):
         self.water_sound = arcade.load_sound("../rsc/water.mp3", )
         self.hit_sound = arcade.load_sound(":resources:sounds/hit5.wav")
         self.checkpoint_sound = arcade.load_sound(":resources:sounds/hit1.wav")
-        self.level_sound = arcade.load_sound(":resources:music/funkyrobot.mp3")
+        self.level_sound = arcade.load_sound(":resources:music/funkyrobot.mp3", streaming=True)
 
     def restart(self) -> arcade.View:
         self.setup()
