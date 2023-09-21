@@ -1,7 +1,7 @@
 import arcade
 
-from src.constants import *
-from src.utils import load_texture_pair
+from constants import *
+from utils import load_texture_pair
 
 
 class PlayerCharacter(arcade.Sprite):
@@ -43,6 +43,9 @@ class PlayerCharacter(arcade.Sprite):
         self.jumping = False
         self.should_update_walk = 0
         self.set_hit_box(self.texture.hit_box_points)
+
+        # Player's inventory
+        self.inventory = []
 
     def update_animation(self, delta_time: float = 1 / 60):
 

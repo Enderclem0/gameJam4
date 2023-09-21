@@ -1,9 +1,10 @@
 
 import arcade
 import os
+import math
 
-from src.entities.player import PlayerCharacter
-from src.constants import *
+from entities.player import PlayerCharacter
+from constants import *
 
 
 class GameView(arcade.View):
@@ -28,6 +29,8 @@ class GameView(arcade.View):
         self.up_pressed = False
         self.down_pressed = False
         self.jump_needs_reset = False
+        self.e_pressed =  False
+        self.a_pressed = False
 
         # Our TileMap Object
         self.tile_map = None
@@ -127,7 +130,7 @@ class GameView(arcade.View):
             self.player_sprite,
             platforms=self.scene[LAYER_NAME_MOVING_PLATFORMS],
             gravity_constant=GRAVITY,
-            walls=self.scene[LAYER_NAME_PLATFORMS]
+            walls=[self.scene[LAYER_NAME_PLATFORMS],self.scene[LAYER_NAME_DOOR]]
         )
         self.music = arcade.play_sound(self.level_sound)
 
@@ -159,6 +162,32 @@ class GameView(arcade.View):
             18,
         )
 
+    def check_for_keys(self):
+
+        self.player_sprite.inventory = arcade.check_for_collision_with_lists(
+            self.player_sprite,
+            [
+                self.scene[LAYER_NAME_KEY]
+            ],
+        ) 
+        for collision in self.player_sprite.inventory:
+            
+            if self.scene[LAYER_NAME_KEY] in collision.sprite_lists:
+                arcade.play_sound(self.checkpoint_sound)
+                collision.remove_from_sprite_lists()
+        
+    def check_to_open(self):
+          
+        door_list = self.scene[LAYER_NAME_DOOR]
+
+        for door in door_list :
+            norm_vect = math.sqrt((self.player_sprite.center_x - door.center_x)**2 + (self.player_sprite.center_y - door.center_y)**2) 
+            # If the player is close to the door and the key can open this door
+            if norm_vect < 100 and door.properties["color"] == self.player_sprite.inventory[0].properties["opening_color"]:
+                self.player_sprite.inventory = []
+                door.remove_from_sprite_lists()
+
+
     def process_keychange(self):
         """
         Called when we change a key up/down or we move on/off a ladder.
@@ -181,6 +210,19 @@ class GameView(arcade.View):
         else:
             self.player_sprite.change_x = 0
 
+        if self.e_pressed : 
+            # if the player has a key, check to open a door 
+            if len(self.player_sprite.inventory) == 1 :
+                self.check_to_open()
+            else:
+            # else check to grab keys near the player
+                self.check_for_keys()
+
+        if self.a_pressed and len(self.player_sprite.inventory) != 0:
+            self.player_sprite.inventory = []
+
+        
+
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed."""
 
@@ -192,6 +234,10 @@ class GameView(arcade.View):
             self.left_pressed = True
         elif key == arcade.key.RIGHT:
             self.right_pressed = True
+        elif key == arcade.key.E:
+            self.e_pressed = True
+        elif key == arcade.key.A:
+            self.a_pressed = True
 
         self.process_keychange()
 
@@ -207,6 +253,10 @@ class GameView(arcade.View):
             self.left_pressed = False
         elif key == arcade.key.RIGHT:
             self.right_pressed = False
+        elif key == arcade.key.E:
+            self.e_pressed = False
+        elif key == arcade.key.A:
+            self.a_pressed = False
 
         self.process_keychange()
 
