@@ -16,21 +16,32 @@ class MainMenu(arcade.View):
         super().__init__()
 
         self.manager = arcade.gui.UIManager()
-        arcade.set_background_color(arcade.color.WHITE)
+        # arcade.set_background_color(arcade.color.WHITE)
+        self.background = arcade.load_texture("rsc/PNG/Menu/Main_menu.jpg")
 
-        # Create a vertical BoxGroup to align buttons
-        self.v_box = arcade.gui.UIBoxLayout()
+        start_button_style = {
+            "font_name": ("time new roman", "arial"),
+            "font_size": 15,
+            "font_color": arcade.color.WHITE,
+            "border_color": arcade.color.AMBER,
+            "bg_color": (255, 191, 0)
+        }
+
+
+        quit_button_style = {
+            "font_name": ("time new roman", "arial"),
+            "font_size": 15,
+            "font_color": arcade.color.WHITE,
+            "border_color": arcade.color.RED,
+            "bg_color": (255, 3, 62)
+        }
+
 
         # Create the buttons
-        start_button = arcade.gui.UIFlatButton(text="Start Game", width=200)
-        self.v_box.add(start_button.with_space_around(bottom=20))
+        start_button = arcade.gui.UIFlatButton(text="Start Game", width=200, style=start_button_style)
 
-        settings_button = arcade.gui.UIFlatButton(text="Settings", width=200)
-        self.v_box.add(settings_button.with_space_around(bottom=20))
+        quit_button = arcade.gui.UIFlatButton(text="Quit", width=200, style=quit_button_style)
 
-        # Again, method 1. Use a child class to handle events.
-        quit_button = arcade.gui.UIFlatButton(text="Quit", width=200)
-        self.v_box.add(quit_button)
 
         # Initialise the button with an on_click event.
         @start_button.event("on_click")
@@ -39,6 +50,7 @@ class MainMenu(arcade.View):
             game_view = GameView()
             self.window.show_view(game_view)
 
+
         @quit_button.event("on_click")
         def on_click_quit_button(event):
             arcade.exit()
@@ -46,14 +58,25 @@ class MainMenu(arcade.View):
         self.manager.add(
             arcade.gui.UIAnchorWidget(
                 anchor_x="center_x",
-                anchor_y="center_y",
-                child=self.v_box
+                anchor_y="bottom",
+                align_x=165,
+                align_y=125,
+                child=start_button
+            )
+        )
+
+        self.manager.add(
+            arcade.gui.UIAnchorWidget(
+                anchor_x="center_x",
+                anchor_y="bottom",
+                align_x=165,
+                align_y=50,
+                child=quit_button
             )
         )
 
     def on_show_view(self):
         """Called when switching to this view."""
-        arcade.set_background_color(arcade.color.WHITE)
 
         self.manager.enable()
 
@@ -63,6 +86,12 @@ class MainMenu(arcade.View):
     def on_draw(self):
         """Draw the menu"""
         self.clear()
+
+        arcade.draw_lrwh_rectangle_textured(0, 0,
+            SCREEN_WIDTH, SCREEN_HEIGHT,
+            self.background
+        )
+
         self.manager.draw()
 
 
