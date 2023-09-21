@@ -36,6 +36,8 @@ class GameView(arcade.View):
 
         # Separate variable that holds the player sprite
         self.player_sprite = None
+        self.restart_x = None
+        self.restart_y = None
 
         # Our 'physics' engine
         self.physics_engine = None
@@ -55,6 +57,7 @@ class GameView(arcade.View):
         self.jump_sound = arcade.load_sound(":resources:sounds/jump1.wav")
         self.game_over = arcade.load_sound(":resources:sounds/gameover1.wav")
         self.hit_sound = arcade.load_sound(":resources:sounds/hit5.wav")
+        self.checkpoint_sound = arcade.load_sound(":resources:sounds/hit1.wav")
 
     def setup(self):
         """Set up the game here. Call this function to restart the game."""
@@ -88,12 +91,13 @@ class GameView(arcade.View):
 
         # Set up the player, specifically placing it at these coordinates.
         self.player_sprite = PlayerCharacter()
-        self.player_sprite.center_x = (
-                self.tile_map.tile_width * TILE_SCALING * PLAYER_START_X
-        )
-        self.player_sprite.center_y = (
-                self.tile_map.tile_height * TILE_SCALING * PLAYER_START_Y
-        )
+
+        self.restart_x = self.tile_map.tile_width * TILE_SCALING * PLAYER_START_X
+        self.restart_y = self.tile_map.tile_height * TILE_SCALING * PLAYER_START_Y
+
+        self.player_sprite.center_x = self.restart_x
+        self.player_sprite.center_y = self.restart_y
+
         self.scene.add_sprite(LAYER_NAME_PLAYER, self.player_sprite)
 
         # Calculate the right edge of the my_map in pixels
@@ -283,6 +287,20 @@ class GameView(arcade.View):
         #         game_over = GameOverView()
         #         self.window.show_view(game_over)
         #         return
+
+
+        # Checkpoints
+        checkpoints_collision = arcade.check_for_collision_with_list(self.player_sprite, self.scene[LAYER_NAME_FLAG])
+
+        if len(checkpoints_collision) > 0:
+
+            self.restart_x = self.player_sprite.center_x
+            self.restart_y = self.player_sprite.center_y
+
+            checkpoints_collision[0].kill()
+
+            arcade.play_sound(self.checkpoint_sound)
+
 
         # Position the camera
         self.center_camera_to_player()

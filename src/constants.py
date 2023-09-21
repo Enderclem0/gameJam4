@@ -31,6 +31,7 @@ LAYER_NAME_ENEMIES = "Enemies"
 LAYER_NAME_SPIKES = "Spike"
 LAYER_NAME_KEY = "Key"
 LAYER_NAME_DOOR = "Door"
+LAYER_NAME_FLAG = "Flag"
 
 # Player start position
 PLAYER_START_X = 2
