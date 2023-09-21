@@ -65,6 +65,14 @@ class GameView(arcade.View):
         self.checkpoint_sound = arcade.load_sound(":resources:sounds/hit1.wav")
         self.level_sound = arcade.load_sound(":resources:music/funkyrobot.mp3")
 
+        # Load textures for HUD
+        self.red_key = arcade.load_texture("../rsc/PNG/Items/keyRed.png")
+        self.green_key = arcade.load_texture("../rsc/PNG/Items/keyGreen.png")
+        self.yellow_key = arcade.load_texture("../rsc/PNG/Items/keyYellow.png")
+        self.blue_key = arcade.load_texture("../rsc/PNG/Items/keyBlue.png")
+
+        self.name_to_texture = {"red":self.red_key,"green": self.green_key,"blue":self.blue_key,"yellow":self.yellow_key}
+
     def restart(self) -> arcade.View:
         self.setup()
         return self
@@ -161,6 +169,11 @@ class GameView(arcade.View):
             arcade.csscolor.BLACK,
             18,
         )
+
+        # Draw HUD
+        if len(self.player_sprite.inventory) == 1:
+            image = self.name_to_texture[self.player_sprite.inventory[0].properties["color"]]
+            arcade.draw_texture_rectangle(image.width//2,image.height,image.width, image.height, image, 0)
 
     def check_for_keys(self):
 
