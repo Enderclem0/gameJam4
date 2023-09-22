@@ -263,13 +263,14 @@ class GameView(arcade.View):
         )
 
         arcade.draw_text(self.action,
-                         SCREEN_WIDTH / 2 - 200,
-                         SCREEN_HEIGHT - 100,
-                         arcade.color.BLACK,
-                         25,
-                         font_name=("Kenney Mini Square")
-
-                         )
+            SCREEN_WIDTH / 2 - 200,
+            SCREEN_HEIGHT - 100,
+            arcade.color.BLACK,
+            25,
+            font_name=("Kenney Mini Square"),
+            multiline=True,
+            width=700
+        )
 
         # Draw HUD
         if len(self.player_sprite.inventory) == 1:
@@ -525,8 +526,12 @@ class GameView(arcade.View):
             self.action = 'Press E to open the door'
         elif grab:
             self.action = 'Press E to grab the object'
+
         elif len(self.player_sprite.inventory) > 0:
-            self.action = 'Press A to drop the object'
+            if self.player_sprite.inventory[0] in self.scene[LAYER_NAME_BOMB]:
+                self.action = 'Press E to launch the bomb\nPress A to drop the object'
+            else:
+                self.action = 'Press A to drop the object'
         else:
             self.action = ''
 
