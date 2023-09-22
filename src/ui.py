@@ -371,7 +371,7 @@ class GameView(arcade.View):
         if distance(self.player_sprite, bomb) < 200:
             # apply force to player depending on the angle between the bomb and the player
             angle = math.atan2(self.player_sprite.center_y - bomb.center_y, self.player_sprite.center_x - bomb.center_x)
-            self.player_sprite.change_x = math.cos(angle) * 120
+            self.player_sprite.change_x = math.cos(angle) * 140
             self.player_sprite.change_y = math.sin(angle) * 10
 
         self.bomb_pressed = False
