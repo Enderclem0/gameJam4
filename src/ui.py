@@ -59,6 +59,9 @@ class GameView(arcade.View):
         # Keep track of the score
         self.score = 0
 
+        # Key to press
+        self.action = ""
+
         # Load sounds
         self.jump_sound = arcade.load_sound(":resources:sounds/jump1.wav")
         self.game_over = arcade.load_sound(":resources:sounds/gameover1.wav")
@@ -151,6 +154,10 @@ class GameView(arcade.View):
         # Keep track of the score
         self.score = 0
 
+        # Key to press
+        self.action = ""
+
+
         # Set up the player, specifically placing it at these coordinates.
         self.player_sprite = PlayerCharacter()
 
@@ -205,14 +212,24 @@ class GameView(arcade.View):
         # Activate the GUI camera before drawing GUI elements
         self.gui_camera.use()
 
+
         # Draw our score on the screen, scrolling it with the viewport
-        score_text = f"Score: {self.score}"
+        coin_image = arcade.load_texture('../rsc/PNG/Items/coinGold.png')
+        arcade.draw_texture_rectangle(30, 40, coin_image.width / 2, coin_image.height / 2, coin_image, 0)
+
         arcade.draw_text(
-            score_text,
-            10,
-            10,
+            self.score,
+            55,
+            30,
             arcade.csscolor.BLACK,
             18,
+        )
+
+        arcade.draw_text(self.action,
+            SCREEN_WIDTH / 2 - 150,
+            SCREEN_HEIGHT - 100,
+            arcade.color.RED,
+            18
         )
 
         # Draw HUD
@@ -424,6 +441,23 @@ class GameView(arcade.View):
                 points = 1
                 self.score += points
                 collision.remove_from_sprite_lists()
+
+
+        # Update action text        
+        _, distance_door = arcade.get_closest_sprite(self.player_sprite, self.scene[LAYER_NAME_DOOR])
+
+        _, distance_key = arcade.get_closest_sprite(self.player_sprite, self.scene[LAYER_NAME_KEY])
+
+
+        if distance_door < 100:
+            self.action = 'Press E to open the door'
+        elif distance_key < 100:
+            self.action = 'Press E to get the key'
+        elif len(self.player_sprite.inventory) > 0:
+            self.action = 'Press A to drop the key'
+        else:
+            self.action = ''
+
 
         # Position the camera
         self.center_camera_to_player()
