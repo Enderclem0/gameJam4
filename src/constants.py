@@ -36,6 +36,7 @@ LAYER_NAME_DOOR = "Door"
 LAYER_NAME_FLAG = "Flag"
 LAYER_NAME_WATER = "Water"
 LAYER_NAME_COINS = "Coins"
+LAYER_NAME_BOMB_WALLS = "Bombing"
 
 # Player start position
 PLAYER_START_X = 2

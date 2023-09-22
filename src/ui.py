@@ -29,8 +29,10 @@ class GameView(arcade.View):
         self.up_pressed = False
         self.down_pressed = False
         self.jump_needs_reset = False
-        self.e_pressed =  False
+        self.e_pressed = False
         self.a_pressed = False
+        self.bomb_pressed = False
+        self.bomb_timer = 0
 
         # Our TileMap Object
         self.tile_map = None
@@ -72,8 +74,10 @@ class GameView(arcade.View):
         self.green_key = arcade.load_texture("../rsc/PNG/Items/keyGreen.png")
         self.yellow_key = arcade.load_texture("../rsc/PNG/Items/keyYellow.png")
         self.blue_key = arcade.load_texture("../rsc/PNG/Items/keyBlue.png")
+        self.bomb = arcade.Sprite("../rsc/PNG/Items/star.png", scale=0.5)
 
-        self.name_to_texture = {"red":self.red_key,"green": self.green_key,"blue":self.blue_key,"yellow":self.yellow_key}
+        self.name_to_texture = {"red": self.red_key, "green": self.green_key, "blue": self.blue_key,
+                                "yellow": self.yellow_key}
 
     def setup(self):
         """Set up the game here. Call this function to restart the game."""
@@ -98,7 +102,7 @@ class GameView(arcade.View):
             self.background.append(sprite)
 
         # Map name
-        map_name = "../rsc/test35.json"
+        map_name = "../rsc/test42.json"
 
         # Layer Specific Options for the Tilemap
         layer_options = {
@@ -125,7 +129,7 @@ class GameView(arcade.View):
             },
             LAYER_NAME_DOOR: {
                 "use_spatial_hash": True,
-            },
+            }
         }
 
         # Load in TileMap
@@ -169,7 +173,7 @@ class GameView(arcade.View):
             self.player_sprite,
             platforms=self.scene[LAYER_NAME_MOVING_PLATFORMS],
             gravity_constant=GRAVITY,
-            walls=[self.scene[LAYER_NAME_PLATFORMS],self.scene[LAYER_NAME_DOOR]]
+            walls=[self.scene[LAYER_NAME_PLATFORMS], self.scene[LAYER_NAME_DOOR], self.scene[LAYER_NAME_BOMB_WALLS]],
         )
         self.music = arcade.play_sound(self.level_sound)
 
@@ -191,6 +195,10 @@ class GameView(arcade.View):
         # Draw our Scene
         self.scene.draw()
 
+        # Draw the bomb
+        if self.bomb_pressed:
+            self.bomb.draw()
+
         # Activate the GUI camera before drawing GUI elements
         self.gui_camera.use()
 
@@ -207,7 +215,7 @@ class GameView(arcade.View):
         # Draw HUD
         if len(self.player_sprite.inventory) == 1:
             image = self.name_to_texture[self.player_sprite.inventory[0].properties["color"]]
-            arcade.draw_texture_rectangle(image.width//2,image.height,image.width, image.height, image, 0)
+            arcade.draw_texture_rectangle(image.width // 2, image.height, image.width, image.height, image, 0)
 
     def check_for_keys(self):
 
@@ -227,13 +235,14 @@ class GameView(arcade.View):
 
         door_list = self.scene[LAYER_NAME_DOOR]
 
-        for door in door_list :
-            norm_vect = math.sqrt((self.player_sprite.center_x - door.center_x)**2 + (self.player_sprite.center_y - door.center_y)**2)
+        for door in door_list:
+            norm_vect = math.sqrt(
+                (self.player_sprite.center_x - door.center_x) ** 2 + (self.player_sprite.center_y - door.center_y) ** 2)
             # If the player is close to the door and the key can open this door
-            if norm_vect < 100 and door.properties["color"] == self.player_sprite.inventory[0].properties["opening_color"]:
+            if norm_vect < 100 and door.properties["color"] == self.player_sprite.inventory[0].properties[
+                "opening_color"]:
                 self.player_sprite.inventory = []
                 door.remove_from_sprite_lists()
-
 
     def process_keychange(self):
         """
@@ -256,18 +265,23 @@ class GameView(arcade.View):
         else:
             self.player_sprite.change_x = 0
 
-        if self.e_pressed :
+        if self.e_pressed:
             # if the player has a key, check to open a door
-            if len(self.player_sprite.inventory) == 1 :
+            if len(self.player_sprite.inventory) == 1:
                 self.check_to_open()
             else:
-            # else check to grab keys near the player
+                # else check to grab keys near the player
                 self.check_for_keys()
 
         if self.a_pressed and len(self.player_sprite.inventory) != 0:
             self.player_sprite.inventory = []
-
-
+        if self.down_pressed:
+            # spawn a bomb in front of the player
+            self.bomb.center_x = self.player_sprite.center_x + 100 * (
+                -1 if self.player_sprite.facing_direction == 1 else 1)
+            self.bomb.center_y = self.player_sprite.center_y - 20
+            self.bomb_pressed = True
+            self.bomb_timer = 120
 
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed."""
@@ -317,9 +331,32 @@ class GameView(arcade.View):
 
         self.camera.move_to(player_centered, speed)
 
+    def explode(self, bomb: arcade.Sprite):
+        def distance(s1: arcade.Sprite, s2: arcade.Sprite):
+            return math.sqrt((s1.center_x - s2.center_x) ** 2 + (s1.center_y - s2.center_y) ** 2)
+
+        bomb_walls = self.scene[LAYER_NAME_BOMB_WALLS]
+        # distance between bomb and walls
+        for w in bomb_walls:
+            if distance(w, bomb) < 200:
+                w.remove_from_sprite_lists()
+        # distance between bomb and player
+        if distance(self.player_sprite, bomb) < 200:
+            # apply force to player depending on the angle between the bomb and the player
+            angle = math.atan2(self.player_sprite.center_y - bomb.center_y, self.player_sprite.center_x - bomb.center_x)
+            self.player_sprite.change_x = math.cos(angle) * 200
+            self.player_sprite.change_y = math.sin(angle) * 10
+
+        self.bomb_pressed = False
+        self.bomb_timer = 0
+
     def on_update(self, delta_time):
         """Movement and game logic"""
 
+        if self.bomb_pressed:
+            self.bomb_timer -= 1
+            if self.bomb_timer == 0:
+                self.explode(self.bomb)
         # Move the player with the physics engine
         self.physics_engine.update()
 
