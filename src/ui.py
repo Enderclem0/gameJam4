@@ -74,10 +74,13 @@ class GameView(arcade.View):
         self.green_key = arcade.load_texture("../rsc/PNG/Items/keyGreen.png")
         self.yellow_key = arcade.load_texture("../rsc/PNG/Items/keyYellow.png")
         self.blue_key = arcade.load_texture("../rsc/PNG/Items/keyBlue.png")
-        self.bomb = arcade.Sprite("../rsc/PNG/Items/star.png", scale=0.5)
+        self.bomb = arcade.Sprite("../rsc/PNG/Tiles/bomb.png")
 
-        self.name_to_texture = {"red": self.red_key, "green": self.green_key, "blue": self.blue_key,
-                                "yellow": self.yellow_key}
+        self.name_to_texture = {"red":self.red_key,
+                                "green": self.green_key,
+                                "blue":self.blue_key,
+                                "yellow":self.yellow_key,
+                                "bomb" : self.bomb}
 
     def setup(self):
         """Set up the game here. Call this function to restart the game."""
@@ -217,12 +220,13 @@ class GameView(arcade.View):
             image = self.name_to_texture[self.player_sprite.inventory[0].properties["color"]]
             arcade.draw_texture_rectangle(image.width // 2, image.height, image.width, image.height, image, 0)
 
-    def check_for_keys(self):
+    def grab_object(self):
 
         self.player_sprite.inventory = arcade.check_for_collision_with_lists(
             self.player_sprite,
             [
-                self.scene[LAYER_NAME_KEY]
+                self.scene[LAYER_NAME_KEY],
+                self.scene[LAYER_NAME_BOMB]
             ],
         )
         for collision in self.player_sprite.inventory:
@@ -265,34 +269,42 @@ class GameView(arcade.View):
         else:
             self.player_sprite.change_x = 0
 
-        if self.e_pressed:
-            # if the player has a key, check to open a door
-            if len(self.player_sprite.inventory) == 1:
-                self.check_to_open()
+        if self.e_pressed :
+            # if the player has an item
+            if len(self.player_sprite.inventory) == 1 :
+
+                # if player has a key, check to open a door
+                if "opening_color" in self.player_sprite.inventory[0].properties.keys():
+                    self.check_to_open()
+
+                else :
+                    # player has a bomb
+                    self.bomb.center_x = self.player_sprite.center_x + 100 * (
+                        -1 if self.player_sprite.facing_direction == 1 else 1)
+                    self.bomb.center_y = self.player_sprite.center_y - 20
+                    self.bomb_pressed = True
+                    self.bomb_timer = 120
+
             else:
-                # else check to grab keys near the player
-                self.check_for_keys()
+            # else check to grab object near the player
+                self.grab_object()
 
         if self.a_pressed and len(self.player_sprite.inventory) != 0:
+            # drop the item
             self.player_sprite.inventory = []
-        if self.down_pressed:
-            # spawn a bomb in front of the player
-            self.bomb.center_x = self.player_sprite.center_x + 100 * (
-                -1 if self.player_sprite.facing_direction == 1 else 1)
-            self.bomb.center_y = self.player_sprite.center_y - 20
-            self.bomb_pressed = True
-            self.bomb_timer = 120
+
+
 
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed."""
 
-        if key == arcade.key.UP:
+        if key == arcade.key.SPACE:
             self.up_pressed = True
-        elif key == arcade.key.DOWN:
+        elif key == arcade.key.S:
             self.down_pressed = True
-        elif key == arcade.key.LEFT:
+        elif key == arcade.key.Q:
             self.left_pressed = True
-        elif key == arcade.key.RIGHT:
+        elif key == arcade.key.D:
             self.right_pressed = True
         elif key == arcade.key.E:
             self.e_pressed = True
@@ -304,14 +316,14 @@ class GameView(arcade.View):
     def on_key_release(self, key, modifiers):
         """Called when the user releases a key."""
 
-        if key == arcade.key.UP:
+        if key == arcade.key.SPACE:
             self.up_pressed = False
             self.jump_needs_reset = False
-        elif key == arcade.key.DOWN:
+        elif key == arcade.key.S:
             self.down_pressed = False
-        elif key == arcade.key.LEFT:
+        elif key == arcade.key.Q:
             self.left_pressed = False
-        elif key == arcade.key.RIGHT:
+        elif key == arcade.key.D:
             self.right_pressed = False
         elif key == arcade.key.E:
             self.e_pressed = False
