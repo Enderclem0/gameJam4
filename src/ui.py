@@ -6,6 +6,21 @@ from src.entities.player import PlayerCharacter
 from src.constants import *
 
 
+class Explosion(arcade.Sprite):
+
+    def __init__(self, texture_list):
+        super().__init__()
+        self.current_texture = 0
+        self.textures = texture_list
+
+    def update(self):
+        self.current_texture += 1
+        if self.current_texture < len(self.textures):
+            self.set_texture(self.current_texture)
+        else:
+            self.remove_from_sprite_lists()
+
+
 class GameView(arcade.View):
     """
     Main application class.
@@ -33,6 +48,7 @@ class GameView(arcade.View):
         self.a_pressed = False
         self.bomb_pressed = False
         self.bomb_timer = 0
+        self.explosion_list = None
 
         # Our TileMap Object
         self.tile_map = None
@@ -78,6 +94,20 @@ class GameView(arcade.View):
         self.yellow_key = arcade.load_texture("../rsc/PNG/Items/keyYellow.png")
         self.blue_key = arcade.load_texture("../rsc/PNG/Items/keyBlue.png")
         self.bomb = arcade.Sprite("../rsc/PNG/Tiles/bomb.png", scale=0.5)
+        # takes too long and would cause the game to pause.
+
+        self.explosion_texture_list = []
+
+        columns = 16
+        count = 60
+        sprite_width = 256
+        sprite_height = 256
+        file_name = ":resources:images/spritesheets/explosion.png"
+
+        # Load the explosions from a sprite sheet
+        self.explosion_texture_list = arcade.load_spritesheet(file_name, sprite_width, sprite_height, columns, count)
+
+        self.explosion_sound = arcade.sound.load_sound(":resources:sounds/explosion2.wav")
 
         self.name_to_texture = {"red": self.red_key,
                                 "green": self.green_key,
@@ -91,6 +121,8 @@ class GameView(arcade.View):
         # Set up the Cameras
         self.camera = arcade.Camera(self.window.width, self.window.height)
         self.gui_camera = arcade.Camera(self.window.width, self.window.height)
+
+        self.explosion_list = arcade.SpriteList()
 
         images = ("../rsc/PNG/Backgrounds/blue_land.png",
                   "../rsc/PNG/Backgrounds/colored_grass.png")
@@ -157,7 +189,6 @@ class GameView(arcade.View):
         # Key to press
         self.action = ""
 
-
         # Set up the player, specifically placing it at these coordinates.
         self.player_sprite = PlayerCharacter()
 
@@ -209,9 +240,10 @@ class GameView(arcade.View):
         if self.bomb_pressed:
             self.bomb.draw()
 
+        self.explosion_list.draw()
+
         # Activate the GUI camera before drawing GUI elements
         self.gui_camera.use()
-
 
         # Draw our score on the screen, scrolling it with the viewport
         coin_image = arcade.load_texture('../rsc/PNG/Items/coinGold.png')
@@ -226,11 +258,11 @@ class GameView(arcade.View):
         )
 
         arcade.draw_text(self.action,
-            SCREEN_WIDTH / 2 - 150,
-            SCREEN_HEIGHT - 100,
-            arcade.color.RED,
-            18
-        )
+                         SCREEN_WIDTH / 2 - 150,
+                         SCREEN_HEIGHT - 100,
+                         arcade.color.RED,
+                         18
+                         )
 
         # Draw HUD
         if len(self.player_sprite.inventory) == 1:
@@ -376,6 +408,12 @@ class GameView(arcade.View):
 
         self.bomb_pressed = False
         self.bomb_timer = 0
+        explosion = Explosion(self.explosion_texture_list)
+        explosion.center_x = bomb.center_x
+        explosion.center_y = bomb.center_y
+        explosion.update()
+        self.explosion_list.append(explosion)
+        arcade.play_sound(self.explosion_sound)
 
     def on_update(self, delta_time):
         """Movement and game logic"""
@@ -384,8 +422,12 @@ class GameView(arcade.View):
             self.bomb_timer -= 1
             if self.bomb_timer == 0:
                 self.explode(self.bomb)
+
+
         # Move the player with the physics engine
         self.physics_engine.update()
+
+        self.explosion_list.update()
 
         # Update animations
         if self.physics_engine.can_jump():
@@ -444,14 +486,13 @@ class GameView(arcade.View):
                 points = 1
                 self.score += points
                 collision.remove_from_sprite_lists()
-            
-            elif self.scene[LAYER_NAME_KEY] in collision.sprite_lists or self.scene[LAYER_NAME_BOMB] in collision.sprite_lists:
+
+            elif self.scene[LAYER_NAME_KEY] in collision.sprite_lists or self.scene[
+                LAYER_NAME_BOMB] in collision.sprite_lists:
                 grab = True
 
-
-        # Update action text        
+        # Update action text
         _, distance_door = arcade.get_closest_sprite(self.player_sprite, self.scene[LAYER_NAME_DOOR])
-
 
         if distance_door < 100 and len(self.player_sprite.inventory) > 0:
             self.action = 'Press E to open the door'
@@ -461,7 +502,6 @@ class GameView(arcade.View):
             self.action = 'Press A to drop the key'
         else:
             self.action = ''
-
 
         # Position the camera
         self.center_camera_to_player()
