@@ -2,8 +2,8 @@ import arcade
 import os
 import math
 
-from src.entities.player import PlayerCharacter
-from src.constants import *
+from entities.player import PlayerCharacter
+from constants import *
 
 
 class GameView(arcade.View):
@@ -72,8 +72,13 @@ class GameView(arcade.View):
         self.green_key = arcade.load_texture("../rsc/PNG/Items/keyGreen.png")
         self.yellow_key = arcade.load_texture("../rsc/PNG/Items/keyYellow.png")
         self.blue_key = arcade.load_texture("../rsc/PNG/Items/keyBlue.png")
+        self.bomb = arcade.load_texture("../rsc/PNG/Tiles/bomb.png")
 
-        self.name_to_texture = {"red":self.red_key,"green": self.green_key,"blue":self.blue_key,"yellow":self.yellow_key}
+        self.name_to_texture = {"red":self.red_key,
+                                "green": self.green_key,
+                                "blue":self.blue_key,
+                                "yellow":self.yellow_key,
+                                "bomb" : self.bomb}
 
     def setup(self):
         """Set up the game here. Call this function to restart the game."""
@@ -98,7 +103,7 @@ class GameView(arcade.View):
             self.background.append(sprite)
 
         # Map name
-        map_name = "../rsc/test35.json"
+        map_name = "../rsc/test42.json"
 
         # Layer Specific Options for the Tilemap
         layer_options = {
@@ -209,17 +214,18 @@ class GameView(arcade.View):
             image = self.name_to_texture[self.player_sprite.inventory[0].properties["color"]]
             arcade.draw_texture_rectangle(image.width//2,image.height,image.width, image.height, image, 0)
 
-    def check_for_keys(self):
+    def grab_object(self):
 
         self.player_sprite.inventory = arcade.check_for_collision_with_lists(
             self.player_sprite,
             [
-                self.scene[LAYER_NAME_KEY]
+                self.scene[LAYER_NAME_KEY],
+                self.scene[LAYER_NAME_BOMB]
             ],
         )
         for collision in self.player_sprite.inventory:
 
-            if self.scene[LAYER_NAME_KEY] in collision.sprite_lists:
+            if self.scene[LAYER_NAME_KEY] or self.scene[LAYER_NAME_BOMB] in collision.sprite_lists:
                 arcade.play_sound(self.checkpoint_sound)
                 collision.remove_from_sprite_lists()
 
@@ -234,6 +240,10 @@ class GameView(arcade.View):
                 self.player_sprite.inventory = []
                 door.remove_from_sprite_lists()
 
+    def explose(self):
+        # explose and drop the bomb from the inventory
+
+        self.player_sprite.inventory = []
 
     def process_keychange(self):
         """
@@ -257,14 +267,24 @@ class GameView(arcade.View):
             self.player_sprite.change_x = 0
 
         if self.e_pressed :
-            # if the player has a key, check to open a door
+            # if the player has an item
             if len(self.player_sprite.inventory) == 1 :
-                self.check_to_open()
+                
+                # if player has a key, check to open a door 
+                if "opening_color" in self.player_sprite.inventory[0].properties.keys():
+                    self.check_to_open()
+
+                else : 
+                # player has a bomb
+                    print("explose")
+                    self.explose()
+                
             else:
-            # else check to grab keys near the player
-                self.check_for_keys()
+            # else check to grab object near the player
+                self.grab_object()
 
         if self.a_pressed and len(self.player_sprite.inventory) != 0:
+            # drop the item
             self.player_sprite.inventory = []
 
 
