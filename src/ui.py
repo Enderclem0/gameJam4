@@ -292,13 +292,13 @@ class GameView(arcade.View):
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed."""
 
-        if key == arcade.key.UP:
+        if key == arcade.key.SPACE:
             self.up_pressed = True
-        elif key == arcade.key.DOWN:
+        elif key == arcade.key.S:
             self.down_pressed = True
-        elif key == arcade.key.LEFT:
+        elif key == arcade.key.Q:
             self.left_pressed = True
-        elif key == arcade.key.RIGHT:
+        elif key == arcade.key.D:
             self.right_pressed = True
         elif key == arcade.key.E:
             self.e_pressed = True
@@ -310,14 +310,14 @@ class GameView(arcade.View):
     def on_key_release(self, key, modifiers):
         """Called when the user releases a key."""
 
-        if key == arcade.key.UP:
+        if key == arcade.key.SPACE:
             self.up_pressed = False
             self.jump_needs_reset = False
-        elif key == arcade.key.DOWN:
+        elif key == arcade.key.S:
             self.down_pressed = False
-        elif key == arcade.key.LEFT:
+        elif key == arcade.key.Q:
             self.left_pressed = False
-        elif key == arcade.key.RIGHT:
+        elif key == arcade.key.D:
             self.right_pressed = False
         elif key == arcade.key.E:
             self.e_pressed = False
