@@ -2,8 +2,8 @@ import arcade
 import os
 import math
 
-from src.entities.player import PlayerCharacter
-from src.constants import *
+from entities.player import PlayerCharacter
+from constants import *
 
 
 class Explosion(arcade.Sprite):
@@ -252,17 +252,20 @@ class GameView(arcade.View):
         arcade.draw_text(
             self.score,
             55,
-            30,
+            32,
             arcade.csscolor.BLACK,
             18,
+            font_name=("Kenney Mini Square")
         )
 
         arcade.draw_text(self.action,
-                         SCREEN_WIDTH / 2 - 150,
-                         SCREEN_HEIGHT - 100,
-                         arcade.color.RED,
-                         18
-                         )
+            SCREEN_WIDTH / 2 - 200,
+            SCREEN_HEIGHT - 100,
+            arcade.color.BLACK,
+            25,
+            font_name=("Kenney Mini Square")
+
+        )
 
         # Draw HUD
         if len(self.player_sprite.inventory) == 1:
@@ -456,6 +459,7 @@ class GameView(arcade.View):
                 self.scene[LAYER_NAME_WATER],
                 self.scene[LAYER_NAME_FLAG],
                 self.scene[LAYER_NAME_COINS],
+                self.scene[LAYER_NAME_EXIT],
                 self.scene[LAYER_NAME_KEY],
                 self.scene[LAYER_NAME_BOMB]
             ],
@@ -476,17 +480,22 @@ class GameView(arcade.View):
                 game_over = GameOverView(self, "water")
                 self.window.show_view(game_over)
                 return
+            elif self.scene[LAYER_NAME_EXIT] in collision.sprite_lists:
+                game_over = GameOverView(self, "win")
+                self.window.show_view(game_over)
+                return
             elif self.scene[LAYER_NAME_FLAG] in collision.sprite_lists:
                 self.restart_x = self.player_sprite.center_x
                 self.restart_y = self.player_sprite.center_y
                 arcade.play_sound(self.checkpoint_sound)
                 collision.remove_from_sprite_lists()
+                return
             elif self.scene[LAYER_NAME_COINS] in collision.sprite_lists:
                 arcade.play_sound(self.collect_coin_sound)
                 points = 1
                 self.score += points
                 collision.remove_from_sprite_lists()
-
+                return
             elif self.scene[LAYER_NAME_KEY] in collision.sprite_lists or self.scene[
                 LAYER_NAME_BOMB] in collision.sprite_lists:
                 grab = True

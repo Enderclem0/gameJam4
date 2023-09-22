@@ -38,6 +38,7 @@ LAYER_NAME_WATER = "Water"
 LAYER_NAME_COINS = "Coins"
 LAYER_NAME_BOMB_WALLS = "Bombing"
 LAYER_NAME_BOMB = "Bomb"
+LAYER_NAME_EXIT = "Exit"
 
 # Player start position
 PLAYER_START_X = 2
