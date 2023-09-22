@@ -520,7 +520,7 @@ class GameView(arcade.View):
         elif grab:
             self.action = 'Press E to grab the object'
         elif len(self.player_sprite.inventory) > 0:
-            self.action = 'Press A to drop the key'
+            self.action = 'Press A to drop the object'
         else:
             self.action = ''
 
