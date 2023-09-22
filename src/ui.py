@@ -93,6 +93,9 @@ class GameView(arcade.View):
         self.green_key = arcade.load_texture("../rsc/PNG/Items/keyGreen.png")
         self.yellow_key = arcade.load_texture("../rsc/PNG/Items/keyYellow.png")
         self.blue_key = arcade.load_texture("../rsc/PNG/Items/keyBlue.png")
+        self.enemy_texture1 = arcade.load_texture("../rsc/PNG/Enemies/sawHalf.png")
+        self.enemy_texture2 = arcade.load_texture("../rsc/PNG/Enemies/sawHalf_move.png")
+        self.enemy_texture_timer = 0
         self.bomb = arcade.Sprite("../rsc/PNG/Tiles/bomb.png", scale=0.5)
         # takes too long and would cause the game to pause.
 
@@ -259,13 +262,13 @@ class GameView(arcade.View):
         )
 
         arcade.draw_text(self.action,
-            SCREEN_WIDTH / 2 - 200,
-            SCREEN_HEIGHT - 100,
-            arcade.color.BLACK,
-            25,
-            font_name=("Kenney Mini Square")
+                         SCREEN_WIDTH / 2 - 200,
+                         SCREEN_HEIGHT - 100,
+                         arcade.color.BLACK,
+                         25,
+                         font_name=("Kenney Mini Square")
 
-        )
+                         )
 
         # Draw HUD
         if len(self.player_sprite.inventory) == 1:
@@ -426,6 +429,15 @@ class GameView(arcade.View):
             if self.bomb_timer == 0:
                 self.explode(self.bomb)
 
+        for enemy in self.scene[LAYER_NAME_ENEMIES]:
+            if self.enemy_texture_timer == 0:
+                if enemy.texture == self.enemy_texture1:
+                    enemy.texture = self.enemy_texture2
+                else:
+                    enemy.texture = self.enemy_texture1
+                self.enemy_texture_timer = 3
+            else:
+                self.enemy_texture_timer -= 1
 
         # Move the player with the physics engine
         self.physics_engine.update()
