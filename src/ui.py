@@ -209,12 +209,15 @@ class GameView(arcade.View):
         # Activate the GUI camera before drawing GUI elements
         self.gui_camera.use()
 
+
         # Draw our score on the screen, scrolling it with the viewport
-        score_text = f"Score: {self.score}"
+        coin_image = arcade.load_texture('../rsc/PNG/Items/coinGold.png')
+        arcade.draw_texture_rectangle(30, 40, coin_image.width / 2, coin_image.height / 2, coin_image, 0)
+
         arcade.draw_text(
-            score_text,
-            10,
-            10,
+            self.score,
+            55,
+            30,
             arcade.csscolor.BLACK,
             18,
         )
