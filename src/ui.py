@@ -225,7 +225,7 @@ class GameView(arcade.View):
         )
         for collision in self.player_sprite.inventory:
 
-            if self.scene[LAYER_NAME_KEY] or self.scene[LAYER_NAME_BOMB] in collision.sprite_lists:
+            if self.scene[LAYER_NAME_KEY] in collision.sprite_lists:
                 arcade.play_sound(self.checkpoint_sound)
                 collision.remove_from_sprite_lists()
 
