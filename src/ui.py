@@ -108,7 +108,7 @@ class GameView(arcade.View):
             self.background.append(sprite)
 
         # Map name
-        map_name = "../rsc/test48.json"
+        map_name = "../rsc/test50.json"
 
         # Layer Specific Options for the Tilemap
         layer_options = {
