@@ -140,7 +140,7 @@ class GameView(arcade.View):
             self.background.append(sprite)
 
         # Map name
-        map_name = "../rsc/test50.json"
+        map_name = "../rsc/test52.json"
 
         # Layer Specific Options for the Tilemap
         layer_options = {
@@ -534,6 +534,7 @@ class GameOverView(arcade.View):
     def __init__(self, game_view: arcade.View, mode):
         """This is run once when we switch to this view"""
         super().__init__()
+        self.is_end = mode == "win"
         self.game_view = game_view
 
         self.background = arcade.load_texture(f"../rsc/PNG/Menu/Game_over_{mode}.jpg")
@@ -553,6 +554,8 @@ class GameOverView(arcade.View):
 
     def on_mouse_press(self, _x, _y, _button, _modifiers):
         """Use a mouse press to advance to the 'game' view."""
+        if self.is_end:
+            arcade.exit()
         if self.game_view is not None:
             self.window.show_view(self.game_view)
         else:
