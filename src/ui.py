@@ -220,16 +220,19 @@ class GameView(arcade.View):
         arcade.draw_text(
             self.score,
             55,
-            30,
+            32,
             arcade.csscolor.BLACK,
             18,
+            font_name=("Kenney Mini Square")
         )
 
         arcade.draw_text(self.action,
-            SCREEN_WIDTH / 2 - 150,
+            SCREEN_WIDTH / 2 - 200,
             SCREEN_HEIGHT - 100,
-            arcade.color.RED,
-            18
+            arcade.color.BLACK,
+            25,
+            font_name=("Kenney Mini Square")
+
         )
 
         # Draw HUD
@@ -414,7 +417,7 @@ class GameView(arcade.View):
                 self.scene[LAYER_NAME_WATER],
                 self.scene[LAYER_NAME_FLAG],
                 self.scene[LAYER_NAME_COINS],
-                self.scene[LAYER_NAME_EXIT]
+                self.scene[LAYER_NAME_EXIT],
                 self.scene[LAYER_NAME_KEY],
                 self.scene[LAYER_NAME_BOMB]
             ],
