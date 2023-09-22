@@ -2,8 +2,8 @@ import arcade
 import os
 import math
 
-from src.entities.player import PlayerCharacter
-from src.constants import *
+from entities.player import PlayerCharacter
+from constants import *
 
 
 class GameView(arcade.View):
@@ -414,6 +414,7 @@ class GameView(arcade.View):
                 self.scene[LAYER_NAME_WATER],
                 self.scene[LAYER_NAME_FLAG],
                 self.scene[LAYER_NAME_COINS],
+                self.scene[LAYER_NAME_EXIT]
             ],
         )
         for collision in player_collision_list:
@@ -429,16 +430,23 @@ class GameView(arcade.View):
                 game_over = GameOverView(self, "water")
                 self.window.show_view(game_over)
                 return
+            elif self.scene[LAYER_NAME_EXIT] in collision.sprite_lists:
+                game_over = GameOverView(self, "win")
+                self.window.show_view(game_over)
+                return
             elif self.scene[LAYER_NAME_FLAG] in collision.sprite_lists:
                 self.restart_x = self.player_sprite.center_x
                 self.restart_y = self.player_sprite.center_y
                 arcade.play_sound(self.checkpoint_sound)
                 collision.remove_from_sprite_lists()
+                return
             elif self.scene[LAYER_NAME_COINS] in collision.sprite_lists:
                 arcade.play_sound(self.collect_coin_sound)
                 points = 1
                 self.score += points
                 collision.remove_from_sprite_lists()
+                return
+                
 
 
         # Update action text        
