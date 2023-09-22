@@ -108,7 +108,7 @@ class GameView(arcade.View):
             self.background.append(sprite)
 
         # Map name
-        map_name = "../rsc/test48.json"
+        map_name = "../rsc/test50.json"
 
         # Layer Specific Options for the Tilemap
         layer_options = {
@@ -371,7 +371,7 @@ class GameView(arcade.View):
         if distance(self.player_sprite, bomb) < 200:
             # apply force to player depending on the angle between the bomb and the player
             angle = math.atan2(self.player_sprite.center_y - bomb.center_y, self.player_sprite.center_x - bomb.center_x)
-            self.player_sprite.change_x = math.cos(angle) * 120
+            self.player_sprite.change_x = math.cos(angle) * 140
             self.player_sprite.change_y = math.sin(angle) * 10
 
         self.bomb_pressed = False
@@ -415,8 +415,13 @@ class GameView(arcade.View):
                 self.scene[LAYER_NAME_FLAG],
                 self.scene[LAYER_NAME_COINS],
                 self.scene[LAYER_NAME_EXIT]
+                self.scene[LAYER_NAME_KEY],
+                self.scene[LAYER_NAME_BOMB]
             ],
         )
+
+        grab = False
+
         for collision in player_collision_list:
             if self.scene[LAYER_NAME_ENEMIES] in collision.sprite_lists:
                 arcade.stop_sound(self.music)
@@ -447,18 +452,19 @@ class GameView(arcade.View):
                 collision.remove_from_sprite_lists()
                 return
                 
+            
+            elif self.scene[LAYER_NAME_KEY] in collision.sprite_lists or self.scene[LAYER_NAME_BOMB] in collision.sprite_lists:
+                grab = True
 
 
         # Update action text        
         _, distance_door = arcade.get_closest_sprite(self.player_sprite, self.scene[LAYER_NAME_DOOR])
 
-        _, distance_key = arcade.get_closest_sprite(self.player_sprite, self.scene[LAYER_NAME_KEY])
 
-
-        if distance_door < 100:
+        if distance_door < 100 and len(self.player_sprite.inventory) > 0:
             self.action = 'Press E to open the door'
-        elif distance_key < 100:
-            self.action = 'Press E to get the key'
+        elif grab:
+            self.action = 'Press E to grab the object'
         elif len(self.player_sprite.inventory) > 0:
             self.action = 'Press A to drop the key'
         else:
