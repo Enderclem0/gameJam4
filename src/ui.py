@@ -77,13 +77,13 @@ class GameView(arcade.View):
         self.green_key = arcade.load_texture("../rsc/PNG/Items/keyGreen.png")
         self.yellow_key = arcade.load_texture("../rsc/PNG/Items/keyYellow.png")
         self.blue_key = arcade.load_texture("../rsc/PNG/Items/keyBlue.png")
-        self.bomb = arcade.Sprite("../rsc/PNG/Tiles/bomb.png")
+        self.bomb = arcade.Sprite("../rsc/PNG/Tiles/bomb.png", scale=0.5)
 
-        self.name_to_texture = {"red":self.red_key,
+        self.name_to_texture = {"red": self.red_key,
                                 "green": self.green_key,
-                                "blue":self.blue_key,
-                                "yellow":self.yellow_key,
-                                "bomb" : self.bomb}
+                                "blue": self.blue_key,
+                                "yellow": self.yellow_key,
+                                "bomb": self.bomb.texture}
 
     def setup(self):
         """Set up the game here. Call this function to restart the game."""
@@ -108,7 +108,7 @@ class GameView(arcade.View):
             self.background.append(sprite)
 
         # Map name
-        map_name = "../rsc/test42.json"
+        map_name = "../rsc/test48.json"
 
         # Layer Specific Options for the Tilemap
         layer_options = {
@@ -286,15 +286,15 @@ class GameView(arcade.View):
         else:
             self.player_sprite.change_x = 0
 
-        if self.e_pressed :
+        if self.e_pressed:
             # if the player has an item
-            if len(self.player_sprite.inventory) == 1 :
+            if len(self.player_sprite.inventory) == 1:
 
                 # if player has a key, check to open a door
                 if "opening_color" in self.player_sprite.inventory[0].properties.keys():
                     self.check_to_open()
 
-                else :
+                else:
                     # player has a bomb
                     self.bomb.center_x = self.player_sprite.center_x + 100 * (
                         -1 if self.player_sprite.facing_direction == 1 else 1)
@@ -303,14 +303,12 @@ class GameView(arcade.View):
                     self.bomb_timer = 120
 
             else:
-            # else check to grab object near the player
+                # else check to grab object near the player
                 self.grab_object()
 
         if self.a_pressed and len(self.player_sprite.inventory) != 0:
             # drop the item
             self.player_sprite.inventory = []
-
-
 
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed."""
@@ -373,7 +371,7 @@ class GameView(arcade.View):
         if distance(self.player_sprite, bomb) < 200:
             # apply force to player depending on the angle between the bomb and the player
             angle = math.atan2(self.player_sprite.center_y - bomb.center_y, self.player_sprite.center_x - bomb.center_x)
-            self.player_sprite.change_x = math.cos(angle) * 200
+            self.player_sprite.change_x = math.cos(angle) * 120
             self.player_sprite.change_y = math.sin(angle) * 10
 
         self.bomb_pressed = False
