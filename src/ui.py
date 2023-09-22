@@ -382,6 +382,9 @@ class GameView(arcade.View):
             self.e_pressed = False
         elif key == arcade.key.A:
             self.a_pressed = False
+        elif key == arcade.key.N:
+            new_game = GameView()
+            self.window.show_view(new_game)
 
         self.process_keychange()
 
