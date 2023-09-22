@@ -87,6 +87,7 @@ class GameView(arcade.View):
         self.level_sound = arcade.load_sound(":resources:music/funkyrobot.mp3", streaming=True)
         self.collect_coin_sound = arcade.load_sound(":resources:sounds/coin1.wav")
         self.level_sound = arcade.load_sound(":resources:music/funkyrobot.mp3")
+        self.win_sound = arcade.load_sound("../rsc/win.mp3")
 
         # Load textures for HUD
         self.red_key = arcade.load_texture("../rsc/PNG/Items/keyRed.png")
@@ -143,7 +144,7 @@ class GameView(arcade.View):
             self.background.append(sprite)
 
         # Map name
-        map_name = "../rsc/test52.json"
+        map_name = "../rsc/map.json"
 
         # Layer Specific Options for the Tilemap
         layer_options = {
@@ -497,6 +498,8 @@ class GameView(arcade.View):
                 return
             elif self.scene[LAYER_NAME_EXIT] in collision.sprite_lists:
                 game_over = GameOverView(self, "win")
+                arcade.stop_sound(self.music)
+                arcade.play_sound(self.win_sound)
                 self.window.show_view(game_over)
                 return
             elif self.scene[LAYER_NAME_FLAG] in collision.sprite_lists:
